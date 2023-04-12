@@ -1,6 +1,6 @@
 # Personal_Diary
 
-#THIS PROJECT IS A CLASS WORK. SO, TILL JUNE 2023, THIS PROJECT WILL BE CLOSED. PLEASE DON'T SEND ANY POLL REQUEST. BUT WE WILL APPRICIATE COMMENTS
+# THIS PROJECT IS A CLASS WORK. SO, TILL JUNE 2023, THIS PROJECT WILL BE CLOSED. PLEASE DON'T SEND ANY PULL REQUESTS. BUT WE YOUR VALUABLE APPRICIATE COMMENTS AND YOU CAN SHARE YOUR IDEAS
 
 Our goal is to create a terminal-based personal diary in C language that prioritizes security and user management. The diary will be stored in a binary file that is divided into two parts.
 
