@@ -6,6 +6,8 @@
 
 #include<string.h>
 
+int safeInput();
+
 int password();
 
 void addrecord();
@@ -14,7 +16,7 @@ void viewrecord();
 
 void editrecord();
 
-void editpassword();
+void editPassword();
 
 void deleterecord();
 
@@ -66,7 +68,8 @@ int main()
 
         printf("\n\n\tENTER YOUR CHOICE:");
 
-        scanf("%d",&ch);
+
+        ch = safeInput();
 
         switch(ch)
 
@@ -98,7 +101,7 @@ int main()
 
         case 5:
 
-            editpassword();
+            editPassword();
 
             break;
 
@@ -130,6 +133,27 @@ int main()
 
 }
 
+// safely take inputs in the program
+int safeInput()    {
+    
+    char str[4];
+
+    int ret = scanf("%1[(0-9)]", str);
+    str[1] = '\0';
+
+    if(ret)    {
+
+        fflush(stdin);
+        int ch = atoi(str);
+        return ch;
+    }
+
+    fflush(stdin);
+
+    return -1;
+
+}
+
 void addrecord( )
 
 {
@@ -146,17 +170,30 @@ void addrecord( )
 
     int choice;
 
+    // chaecking for authentication
+    int pas = password();
+
+    if(pas != 0)    return ;
+
+    system("cls");
+
+
     printf("\n\n\t\t***************************\n");
 
     printf("\t\t* WELCOME TO THE ADD MENU *");
 
     printf("\n\t\t***************************\n\n");
 
+
+
     printf("\n\n\tENTER DATE OF YOUR RECORD:[yyyy-mm-dd]:");
 
     fflush(stdin);
 
-    gets(filename);
+    //updated
+    fgets(filename, sizeof(filename), stdin);
+    
+    filename[strlen(filename)-1] = '\0';
 
     fp = fopen (filename, "ab+" ) ;
 
@@ -192,6 +229,7 @@ void addrecord( )
 
         printf ( "\n\tENTER TIME:[hh:mm]:");
 
+        //potential threat
         scanf("%s",time);
 
         rewind(fp);
@@ -199,7 +237,7 @@ void addrecord( )
         while(fread(&e,sizeof(e),1,fp)==1)
 
         {
-
+            
             if(strcmp(e.time,time)==0)
 
             {
@@ -222,25 +260,35 @@ void addrecord( )
 
             fflush(stdin);
 
-            gets(e.name);
+            fgets(e.name, sizeof(e.name), stdin);
+
+            e.name[strlen(e.name)-1] = '\0';
 
             fflush(stdin);
 
             printf("\tENTER PLACE:");
 
-            gets(e.place);
+            fgets(e.place, sizeof(e.place), stdin);
+
+            e.place[strlen(e.place)-1] = '\0';
 
             fflush(stdin);
 
             printf("\tENTER DURATION:");
+            
+            //updated
+            fgets(e.duration,sizeof(e.duration), stdin);
 
-            gets(e.duration);
+             e.duration[strlen(e.duration)-1] = '\0';
 
             fflush(stdin);
 
             printf("\tNOTE:");
+            
+            //update
+            fgets(e.note, sizeof(e.note), stdin);
 
-            gets(e.note);
+            e.note[strlen(e.note)-1] = '\0';
 
             fwrite ( &e, sizeof ( e ), 1, fp ) ;
 
@@ -253,6 +301,8 @@ void addrecord( )
         fflush ( stdin ) ;
 
         another = getchar( ) ;
+
+        fflush ( stdin ) ;
 
     }
 
@@ -276,7 +326,14 @@ void viewrecord( )
 
     char time[6],choice,filename[14];
 
-    int ch;
+    int ch, pass;
+
+    // checking authentication
+    pass = password();
+
+    if(pass != 0)    return ;
+
+    system("cls");
 
     printf("\n\n\t\t*******************************\n");
 
@@ -284,15 +341,6 @@ void viewrecord( )
 
     printf("\n\t\t*******************************\n\n");
 
-    choice=password();
-
-    if(choice!=0)
-
-    {
-
-        return ;
-
-    }
 
     do
 
@@ -302,7 +350,9 @@ void viewrecord( )
 
         fflush(stdin);
 
-        gets(filename);
+        fgets(filename, sizeof(filename), stdin);
+
+        filename[strlen(filename)-1] = '\0';
 
         fpte = fopen ( filename, "rb" ) ;
 
@@ -330,7 +380,7 @@ void viewrecord( )
 
         printf("\n\t\tENTER YOUR CHOICE:");
 
-        scanf("%d",&ch);
+        ch = safeInput();
 
         switch(ch)
 
@@ -348,9 +398,9 @@ void viewrecord( )
 
                 printf("\nTIME: %s",customer.time);
 
-                printf("\nMEETING WITH: %s",customer.name);
+                printf("\nNAME: %s",customer.name);
 
-                printf("\nMEETING AT: %s",customer.place);
+                printf("\nPLACE: %s",customer.place);
 
                 printf("\nDURATION: %s",customer.duration);
 
@@ -368,7 +418,9 @@ void viewrecord( )
 
             printf("\nENTER TIME:[hh:mm]:");
 
-            gets(time);
+            fgets(time, sizeof(time), stdin);
+
+            time[strlen(time)-1] = '\0';
 
             while ( fread ( &customer, sizeof ( customer ), 1, fpte ) == 1 )
 
@@ -382,9 +434,9 @@ void viewrecord( )
 
                     printf("\nTIME: %s",customer.time);
 
-                    printf("\nMEETING WITH: %s",customer.name);
+                    printf("\nNAME: %s",customer.name);
 
-                    printf("\nMEETING AT: %s",customer.place);
+                    printf("\nPLACE: %s",customer.place);
 
                     printf("\nDUARATION: %s",customer.duration);
 
@@ -409,6 +461,8 @@ void viewrecord( )
 
         scanf("%c",&choice);
 
+        fflush(stdin);
+
     }
     while(choice=='Y'||choice=='y');
 
@@ -432,21 +486,20 @@ void editrecord()
 
     int num,count=0;
 
+    //checking for authentication
+    int pass = password();
+    
+    if(pass != 0)    return ;
+
+    system("cls");
+
     printf("\n\n\t\t*******************************\n");
 
     printf("\t\t* WELCOME TO THE EDITING MENU *");
 
     printf("\n\t\t*******************************\n\n");
 
-    choice=password();
-
-    if(choice!=0)
-
-    {
-
-        return ;
-
-    }
+    
 
     do
 
@@ -456,11 +509,19 @@ void editrecord()
 
         fflush(stdin);
 
-        gets(filename);
+        fgets(filename, sizeof(filename), stdin);
+
+        filename[strlen(filename)-1] = '\0';
+
+        fflush(stdin);
 
         printf("\n\tENTER TIME:[hh:mm]:");
 
-        gets(time);
+        fgets(time, sizeof(time), stdin);
+
+        time[strlen(time)-1] = '\0';
+
+        fflush(stdin);
 
         fpte = fopen ( filename, "rb+" ) ;
 
@@ -490,9 +551,9 @@ void editrecord()
 
                 printf("\nTIME: %s",customer.time);
 
-                printf("\nMEETING WITH: %s",customer.name);
+                printf("\nNAME: %s",customer.name);
 
-                printf("\nMEETING AT: %s",customer.place);
+                printf("\nPLACE: %s",customer.place);
 
                 printf("\nDURATION: %s",customer.duration);
 
@@ -502,9 +563,9 @@ void editrecord()
 
                 printf("\n1.TIME.");
 
-                printf("\n2.MEETING PERSON.");
+                printf("\n2.NAME.");
 
-                printf("\n3.MEETING PLACE.");
+                printf("\n3.PLACE.");
 
                 printf("\n4.DURATION.");
 
@@ -522,7 +583,7 @@ void editrecord()
 
                     fflush(stdin);
 
-                    scanf("%d",&num);
+                    num = safeInput();
 
                     fflush(stdin);
 
@@ -535,14 +596,16 @@ void editrecord()
 
                         printf("\nNEW TIME:[hh:mm]:");
 
-                        gets(customer.time);
+                        fgets(customer.time, sizeof(customer.time), stdin);
+
+                        customer.time[strlen(customer.time)-1] = '\0';
 
                         break;
 
                     case 2:
                         printf("\nENTER THE NEW DATA:");
 
-                        printf("\nNEW MEETING PERSON:");
+                        printf("\nNEW NAME:");
 
                         gets(customer.name);
 
@@ -551,7 +614,7 @@ void editrecord()
                     case 3:
                         printf("\nENTER THE NEW DATA:");
 
-                        printf("\nNEW MEETING PLACE:");
+                        printf("\nNEW PLACE:");
 
                         gets(customer.place);
 
@@ -582,11 +645,11 @@ void editrecord()
 
                         gets(customer.time);
 
-                        printf("\nNEW MEETING PERSON:");
+                        printf("\nNEW NAME:");
 
                         gets(customer.name);
 
-                        printf("\nNEW MEETING PLACE:");
+                        printf("\nNEW PLACE:");
 
                         gets(customer.place);
 
@@ -651,9 +714,9 @@ void editrecord()
 
             printf("\nTIME: %s",customer.time);
 
-            printf("\nMEETING WITH: %s",customer.name);
+            printf("\nNAME: %s",customer.name);
 
-            printf("\nMEETING AT: %s",customer.place);
+            printf("\nPLACE: %s",customer.place);
 
             printf("\nDURATION: %s",customer.duration);
 
@@ -663,7 +726,11 @@ void editrecord()
 
             printf("\n\n\tWOULD YOU LIKE TO EDIT ANOTHER RECORD.(Y/N)");
 
+            fflush(stdin);
+
             scanf("%c",&choice);
+
+            fflush(stdin);
 
             count++;
 
@@ -677,7 +744,11 @@ void editrecord()
 
             printf("\nWOULD YOU LIKE TO TRY AGAIN...(Y/N)");
 
+            fflush(stdin);
+
             scanf("%c",&choice);
+
+            fflush(stdin);
 
         }
 
@@ -704,339 +775,184 @@ void editrecord()
 
 }
 
-int password()
 
-{
+// Recieves password entry from the user
+// MAX PASS len is 12
+// Takes input untill user press ENTER
+// Has the functionality of "Backspace" and Password hiding with "*"
+void passEntry(char* pass)    {
 
-    char pass[15]= {0},check[15]= {0},ch;
+    int i = 0;
+    pass[0]=getch();
 
-    FILE *fpp;
-
-    int i=0,j;
-
-    printf("::FOR SECURITY PURPOSE::");
-
-    printf("::ONLY THREE TRIALS ARE ALLOWED::");
-
-    for(j=0; j<3; j++)
-
-    {
-
-        i=0;
-
-        printf("\n\n\tENTER THE PASSWORD:");
-
-        pass[0]=getch();
-
-        while(pass[i]!='\r')
-
-        {
-
-            if(pass[i]=='\b')
-
-            {
-
-                i--;
-
-                printf("\b");
-
-                printf(" ");
-
-                printf("\b");
-
-                pass[i]=getch();
-
-            }
-
-            else
-
-            {
-
-                printf("*");
-
-                i++;
-
-                pass[i]=getch();
-
-            }
+    while(pass[i]!='\r')    {
+            
+        if(pass[i]=='\b')    {
+            i--;
+            printf("\b");
+            printf(" ");
+            printf("\b");
+            pass[i]=getch();
 
         }
+        else if(i >= 12)    {
+            pass[i] = getch();
+        }
+        else    {
+            printf("*");
+            i++;
+            pass[i]=getch();
+        }
+    }
 
-        pass[i]='\0';
+    pass[i]='\0';
+}
 
-        fpp=fopen("SE","r");
+// function to check authentication
+// returns 0 if matches other wise false
+// Max Length of the password is 12
+int password()    {
 
-        if (fpp==NULL)
+    char pass[15] = {0}, check[15]= {0},ch;
 
-        {
+    FILE *fpp;
+    int i = 0, j;
+
+    printf("::FOR SECURITY PURPOSE::");
+    printf("::ONLY THREE TRIALS ARE ALLOWED::");
+
+    for(j = 0; j < 3; j++)
+
+    {
+        //read the password from user
+        printf("\n\n\tENTER THE PASSWORD:");
+        passEntry(pass);
+        
+        fpp = fopen("SE","r");
+        if (fpp == NULL)    {
 
             printf("\nERROR WITH THE SYSTEM FILE...[FILE MISSING]\n");
-
             getch();
 
             return 1;
-
         }
 
-        else
+        // reads the password from the file
+        // decript it and puts it int the check string
+        while( 1 )    {
 
-            i=0;
+            ch = fgetc(fpp);
+            if(ch == EOF)    {
 
-        while(1)
-
-        {
-
-            ch=fgetc(fpp);
-
-            if(ch==EOF)
-
-            {
-
-                check[i]='\0';
-
+                check[i] = '\0';
                 break;
-
             }
 
-            check[i]=ch-5;
-
+            check[i] = ch - 5;
             i++;
 
         }
 
-        if(strcmp(pass,check)==0)
-
-        {
+        if(strcmp(pass,check)==0)    {
 
             printf("\n\n\tACCESS GRANTED...\n");
-
             return 0;
-
         }
 
         else
-
-        {
-
             printf("\n\n\tWRONG PASSWORD..\n\n\tACCESS DENIED...\n");
-
-        }
-
     }
 
     printf("\n\n\t::YOU ENTERED WRONG PASSWORD::YOU ARE NOT ALLOWED TO ACCESS ANY FILE::\n\n\tPRESS ANY KEY TO GO BACK...");
-
     getch();
 
     return 1;
-
 }
 
-void editpassword()
-
-{
+// Changes password
+void editPassword()    {
 
     system("cls");
 
     printf("\n");
 
-    char pass[15]= {0},confirm[15]= {0},ch;
+    char pass[15]= {0}, conform[15] = {0}, ch;
+    int choice, i, check;
 
-    int choice,i,check;
-
-    FILE *fp;
-
-    fp=fopen("SE","rb");
-
-    if(fp==NULL)
-
-    {
-
-        fp=fopen("SE","wb");
-
-        if(fp==NULL)
-
-        {
-
+    // checks if the file already exits or not,if not creates the file 
+    // upon creating the file default pass is empty
+    FILE* fp = fopen("SE","rb");
+    if(fp == NULL)    {
+        
+        fp = fopen("SE","wb");
+        if(fp == NULL)    {
             printf("SYSTEM ERROR...");
-
             getch();
-
             return ;
-
         }
 
         fclose(fp);
 
         printf("\nSYSTEM RESTORED...\nYOUR PASSWORD IS 'ENTER'\n PRESS ENTER TO CHANGE PASSWORD\n\n");
-
         getch();
-
     }
 
     fclose(fp);
 
-    check=password();
+    // checks current password
+    check = password();
+    if(check == 1)    return ;
 
-    if(check==1)
+    // Takes new pass and conforms it . Iterates untill the passwords are matched
+    do    {
+        if(check == 0)    {
 
-    {
+            choice = 0;
 
-        return ;
-
-    }
-
-    do
-
-    {
-
-        if(check==0)
-
-        {
-
-            i=0;
-
-            choice=0;
-
+            // Take New Password input from user
             printf("\n\n\tENTER THE NEW PASSWORD:");
-
             fflush(stdin);
+            passEntry(pass);
 
-            pass[0]=getch();
+            // Take New Password conformation from the user
+            printf("\n\tCONFORM PASSWORD:");
+            fflush(stdin);
+            passEntry(conform);
 
-            while(pass[i]!='\r')
+            if(strcmp(pass,conform) == 0)    {
 
-            {
+                fp = fopen("SE","wb");
 
-                if(pass[i]=='\b')
-
-                {
-
-                    i--;
-
-                    printf("\b");
-
-                    printf(" ");
-
-                    printf("\b");
-
-                    pass[i]=getch();
-
-                }
-
-                else
-
-                {
-
-                    printf("*");
-
-                    i++;
-
-                    pass[i]=getch();
-
-                }
-
-            }
-
-            pass[i]='\0';
-
-            i=0;
-
-            printf("\n\tCONFIRM PASSWORD:");
-
-            confirm[0]=getch();
-
-            while(confirm[i]!='\r')
-
-            {
-
-                if(confirm[i]=='\b')
-
-                {
-
-                    i--;
-
-                    printf("\b");
-
-                    printf(" ");
-
-                    printf("\b");
-
-                    confirm[i]=getch();
-
-                }
-
-                else
-
-                {
-
-                    printf("*");
-
-                    i++;
-
-                    confirm[i]=getch();
-
-                }
-
-            }
-
-            confirm[i]='\0';
-
-            if(strcmp(pass,confirm)==0)
-
-            {
-
-                fp=fopen("SE","wb");
-
-                if(fp==NULL)
-
-                {
+                if(fp==NULL)    {
 
                     printf("\n\t\tSYSTEM ERROR");
-
                     getch();
-
                     return ;
-
                 }
 
-                i=0;
+                // Updates the file with the new Encrypted password
+                i = 0;
+                while(pass[i] != '\0')    {
 
-                while(pass[i]!='\0')
-
-                {
-
-                    ch=pass[i];
-
-                    putc(ch+5,fp);
-
+                    ch = pass[i];
+                    putc(ch + 5, fp);
                     i++;
-
                 }
-
                 putc(EOF,fp);
-
                 fclose(fp);
-
             }
 
-            else
-
-            {
-
+            else    {
                 printf("\n\tTHE NEW PASSWORD DOES NOT MATCH.");
-
-                choice=1;
-
+                choice = 1;
             }
 
         }
 
     }
-    while(choice==1);
+    while(choice == 1);
 
     printf("\n\n\tPASSWORD CHANGED...\n\n\tPRESS ANY KEY TO GO BACK...");
-
     getch();
 
 }
@@ -1087,7 +1003,9 @@ void deleterecord( )
 
             printf("\n\t\tENTER YOU CHOICE:");
 
-            scanf("%d",&choice);
+            fflush(stdin);
+
+            choice = safeInput();
 
             switch(choice)
 
@@ -1209,6 +1127,8 @@ void deleterecord( )
         fflush(stdin);
 
         scanf("%c",&another);
+
+        fflush(stdin);
 
     }
 
